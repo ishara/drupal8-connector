@@ -1,0 +1,105 @@
+{
+  "uid": [
+    {
+      "value": "1"
+    }
+  ],
+  "uuid": [
+    {
+      "value": null
+    }
+  ],
+  "langcode": [
+    {
+      "value": ""
+    }
+  ],
+  "preferred_langcode": [
+    {
+      "value": ""
+    }
+  ],
+  "preferred_admin_langcode": [
+    {
+      "value": ""
+    }
+  ],
+  "name": [
+    {
+      "value": "admin"
+    }
+  ],
+  "pass": [
+    {
+      "value": "$S$E/o0QNx2vyI8qDJNQr4MUUs446a5B0UL.PpisZJR2fYfvSIwqK1Q"
+    }
+  ],
+  "mail": [
+    {
+      "value": "admin@example.com"
+    }
+  ],
+  "signature": [
+    {
+      "value": ""
+    }
+  ],
+  "signature_format": [
+    {
+      "value": null
+    }
+  ],
+  "theme": [
+    {
+      "value": ""
+    }
+  ],
+  "timezone": [
+    {
+      "value": "GMT"
+    }
+  ],
+  "status": [
+    {
+      "value": "1"
+    }
+  ],
+  "created": [
+    {
+      "value": "1373616767"
+    }
+  ],
+  "access": [
+    {
+      "value": "1374225941"
+    }
+  ],
+  "login": [
+    {
+      "value": "1374226103"
+    }
+  ],
+  "init": [
+    {
+      "value": "admin@example.com"
+    }
+  ],
+  "roles": [
+    {
+      "value": "authenticated"
+    },
+    {
+      "value": "administrator"
+    }
+  ],
+  "user_picture": [
+    {
+      "target_id": null,
+      "revision_id": null,
+      "alt": null,
+      "title": null,
+      "width": null,
+      "height": null
+    }
+  ]
+}

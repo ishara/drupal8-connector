@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:drupal8="http://www.mulesoft.org/schema/mule/drupal8"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/drupal8 http://www.mulesoft.org/schema/mule/drupal8/1.0-SNAPSHOT/mule-drupal8.xsd">
+
+    <drupal8:config host="localhost" port="8080"
+            username="admin" password="openshift_changeme"/>
+
+    <flow name="getNode">
+        <drupal8:get-node nodeId="3"/>
+    </flow>
+    
+    <flow name="createNode">
+        <drupal8:create-node />
+    </flow>
+    
+     <flow name="deleteNode">
+        <drupal8:delete-node nodeId="3" />
+    </flow>
+    
+    <flow name="getUser">
+        <drupal8:get-user userId="1"/>
+    </flow>
+
+</mule>

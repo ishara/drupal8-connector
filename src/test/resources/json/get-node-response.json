@@ -1,0 +1,115 @@
+{
+  "nid": [
+    {
+      "value": "1"
+    }
+  ],
+  "uuid": [
+    {
+      "value": "7940ff6e-e92b-4861-9d0b-119c846f6208"
+    }
+  ],
+  "vid": [
+    {
+      "value": "1"
+    }
+  ],
+  "type": [
+    {
+      "value": "article"
+    }
+  ],
+  "langcode": [
+    {
+      "value": "en"
+    }
+  ],
+  "title": [
+    {
+      "value": "Test Article"
+    }
+  ],
+  "uid": [
+    {
+      "target_id": "1"
+    }
+  ],
+  "status": [
+    {
+      "value": "1"
+    }
+  ],
+  "created": [
+    {
+      "value": "1373620613"
+    }
+  ],
+  "changed": [
+    {
+      "value": "1373620642"
+    }
+  ],
+  "comment": [
+    {
+      "value": "2"
+    }
+  ],
+  "promote": [
+    {
+      "value": "1"
+    }
+  ],
+  "sticky": [
+    {
+      "value": "0"
+    }
+  ],
+  "tnid": [
+    {
+      "value": "0"
+    }
+  ],
+  "translate": [
+    {
+      "value": "0"
+    }
+  ],
+  "revision_timestamp": [
+    {
+      "value": "1373620642"
+    }
+  ],
+  "revision_uid": [
+    {
+      "target_id": "1"
+    }
+  ],
+  "log": [
+    {
+      "value": ""
+    }
+  ],
+  "body": [
+    {
+      "value": "<p>Test article text.</p>\r\n",
+      "format": "basic_html",
+      "summary": ""
+    }
+  ],
+  "field_image": [
+    {
+      "target_id": null,
+      "revision_id": null,
+      "alt": null,
+      "title": null,
+      "width": null,
+      "height": null
+    }
+  ],
+  "field_tags": [
+    {
+      "target_id": "1",
+      "revision_id": null
+    }
+  ]
+}

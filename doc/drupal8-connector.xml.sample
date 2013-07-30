@@ -1,0 +1,15 @@
+<!-- BEGIN_INCLUDE(drupal8:get-node) -->
+    <drupal8:get-node nodeId="1" />
+<!-- END_INCLUDE(drupal8:get-node) -->
+
+<!-- BEGIN_INCLUDE(drupal8:create-node) -->
+    <drupal8:create-node />
+<!-- END_INCLUDE(drupal8:create-node) -->
+
+<!-- BEGIN_INCLUDE(drupal8:delete-node) -->
+    <drupal8:delete-node nodeId="1"/>
+<!-- END_INCLUDE(drupal8:delete-node) -->
+
+<!-- BEGIN_INCLUDE(drupal8:get-user) -->
+    <drupal8:get-user userId="1" />
+<!-- END_INCLUDE(drupal8:get-user) -->
