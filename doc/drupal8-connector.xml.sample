@@ -3,8 +3,16 @@
 <!-- END_INCLUDE(drupal8:get-node) -->
 
 <!-- BEGIN_INCLUDE(drupal8:create-node) -->
-    <drupal8:create-node />
+    <drupal8:create-node>
+       <drupal8:node title="New Article" type="article" />
+    </drupal8:create-node>
 <!-- END_INCLUDE(drupal8:create-node) -->
+
+<!-- BEGIN_INCLUDE(drupal8:update-node) -->
+     <drupal8:update-node>
+       <drupal8:node nid="1" title="fdvdfvdfvdf" type="article" />
+    </drupal8:update-node>
+<!-- END_INCLUDE(drupal8:update-node) -->
 
 <!-- BEGIN_INCLUDE(drupal8:delete-node) -->
     <drupal8:delete-node nodeId="1"/>

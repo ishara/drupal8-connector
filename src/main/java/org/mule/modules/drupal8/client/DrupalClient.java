@@ -14,6 +14,7 @@ public interface DrupalClient {
 	
 	public Node getNode(String nodeId) throws IOException;
 	public Node createNode(Node node) throws IOException;
+	public Node updateNode(Node node) throws IOException;
 	public void deleteNode(String nodeId) throws IOException;
 	
 	public User getUser(String userId) throws IOException;

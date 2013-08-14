@@ -35,19 +35,19 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 		return "mule-config.xml";
 	}
 	
-	@Before
-	public void setupStubs(){
-		stubFor(post(
-				urlEqualTo("/user"))
-				.willReturn(aResponse().withStatus(302).withHeader("Set-Cookie", "SESSION:XXX;Path=/")));
-	}
+//	@Before
+//	public void setupStubs(){
+//		stubFor(post(
+//				urlEqualTo("/user"))
+//				.willReturn(aResponse().withStatus(302).withHeader("Set-Cookie", "SESSION:XXX;Path=/")));
+//	}
 
 	@Test
 	public void testGetNode() throws Exception {
-		stubFor(get(
-				urlMatching("/entity/node/[0-9]+"))
-				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
-		
+//		stubFor(get(
+//				urlMatching("/entity/node/[0-9]+"))
+//				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
+//		
 		
 		Flow flow = lookupFlowConstruct("getNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -60,10 +60,10 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 
 	@Test
 	public void testCreateNode() throws Exception {
-		stubFor(post(
-				urlEqualTo("/entity/node"))
-				.willReturn(aResponse().withStatus(201).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
-		
+//		stubFor(post(
+//				urlEqualTo("/entity/node"))
+//				.willReturn(aResponse().withStatus(201).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
+//		
 		
 		Flow flow = lookupFlowConstruct("createNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -73,34 +73,50 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 		assertNotNull(responseEvent.getMessage().getPayload());
 		assertTrue(responseEvent.getMessage().getPayload() instanceof Node);
 	}
-
+	
 	@Test
-	public void testDeleteNode() throws Exception {
-		stubFor(delete(
-				urlMatching("/entity/node/[0-9]+"))
-				.willReturn(aResponse().withStatus(204)));
+	public void testUpdateNode() throws Exception {
+//		stubFor(post(
+//				urlEqualTo("/entity/node"))
+//				.willReturn(aResponse().withStatus(201).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
+//		
 		
-		Flow flow = lookupFlowConstruct("deleteNode");
-		MuleEvent event = FunctionalTestCase.getTestEvent(null);
-		MuleEvent responseEvent = flow.process(event);
-		
-		assertNotNull(responseEvent);
-	}
-
-	@Test
-	public void testGetUser() throws Exception {
-		stubFor(get(
-				urlMatching("/entity/user/[0-9]+"))
-				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-user-response.json", this.getClass()))));
-		
-		Flow flow = lookupFlowConstruct("getUser");
+		Flow flow = lookupFlowConstruct("updateNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
 		MuleEvent responseEvent = flow.process(event);
 		
 		assertNotNull(responseEvent);
 		assertNotNull(responseEvent.getMessage().getPayload());
-		assertTrue(responseEvent.getMessage().getPayload() instanceof User);
+		assertTrue(responseEvent.getMessage().getPayload() instanceof Node);
 	}
+//
+//	@Test
+//	public void testDeleteNode() throws Exception {
+//		stubFor(delete(
+//				urlMatching("/entity/node/[0-9]+"))
+//				.willReturn(aResponse().withStatus(204)));
+//		
+//		Flow flow = lookupFlowConstruct("deleteNode");
+//		MuleEvent event = FunctionalTestCase.getTestEvent(null);
+//		MuleEvent responseEvent = flow.process(event);
+//		
+//		assertNotNull(responseEvent);
+//	}
+//
+//	@Test
+//	public void testGetUser() throws Exception {
+//		stubFor(get(
+//				urlMatching("/entity/user/[0-9]+"))
+//				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-user-response.json", this.getClass()))));
+//		
+//		Flow flow = lookupFlowConstruct("getUser");
+//		MuleEvent event = FunctionalTestCase.getTestEvent(null);
+//		MuleEvent responseEvent = flow.process(event);
+//		
+//		assertNotNull(responseEvent);
+//		assertNotNull(responseEvent.getMessage().getPayload());
+//		assertTrue(responseEvent.getMessage().getPayload() instanceof User);
+//	}
 
 	/**
 	 * Retrieve a flow by name from the registry

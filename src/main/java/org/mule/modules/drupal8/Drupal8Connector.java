@@ -106,19 +106,33 @@ public class Drupal8Connector {
 	}
 	
 	/**
-	 * Get a Node by a id
+	 * Create a new Node
 	 * 
 	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-node}
-	 * 
+	 *
+	 * @param node
+	 *            Node to create
 	 * @return Node
 	 * @throws IOException exception
 	 */
 	@Processor
-	public Node createNode() throws IOException {
-		Node rNode  = new Node();
-		rNode.setTitle("fefeefefe");
-		rNode.setType("article");
-		return this.client.createNode(rNode);
+	public Node createNode(Node node) throws IOException {
+		return this.client.createNode(node);
+	}
+	
+	/**
+	 * Update an existing Node
+	 * 
+	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:update-node}
+	 *
+	 * @param node
+	 *            Node to update
+	 * @return Node
+	 * @throws IOException exception
+	 */
+	@Processor
+	public Node updateNode(Node node) throws IOException {
+		return this.client.updateNode(node);
 	}
 	
 	/**

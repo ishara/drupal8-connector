@@ -85,6 +85,7 @@ public class User extends DrupalEntity {
 	
 	@JsonProperty("user_picture")
 	private List<UserPicture> user_picture = new ArrayList<UserPicture>();
+	
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
 	public String getUid() {

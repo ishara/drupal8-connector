@@ -9,17 +9,25 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/drupal8 http://www.mulesoft.org/schema/mule/drupal8/1.0-SNAPSHOT/mule-drupal8.xsd">
 
-    <drupal8:config host="localhost" port="8080"
+    <drupal8:config host="drupal8-ryry.rhcloud.com" port="80"
             username="admin" password="openshift_changeme"/>
 
     <flow name="getNode">
-        <drupal8:get-node nodeId="3"/>
+        <drupal8:get-node nodeId="1"/>
     </flow>
     
     <flow name="createNode">
-        <drupal8:create-node />
+        <drupal8:create-node>
+        	<drupal8:node title="New Article" type="article" />
+        </drupal8:create-node>
     </flow>
     
+    <flow name="updateNode">
+        <drupal8:update-node>
+        	<drupal8:node nid="1" title="Updated Article" type="article" />
+        </drupal8:update-node>
+    </flow>
+     
      <flow name="deleteNode">
         <drupal8:delete-node nodeId="3" />
     </flow>
