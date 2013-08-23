@@ -9,7 +9,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/drupal8 http://www.mulesoft.org/schema/mule/drupal8/1.0-SNAPSHOT/mule-drupal8.xsd">
 
-    <drupal8:config host="drupal8-ryry.rhcloud.com" port="80"
+    <drupal8:config host="localhost" port="8888"
             username="admin" password="openshift_changeme"/>
 
     <flow name="getNode">

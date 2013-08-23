@@ -22,3 +22,5 @@ src/main/java/org/mule/modules/drupal8/.DS_Store
 .project
 
 .settings/org.eclipse.jdt.core.prefs
+
+/target

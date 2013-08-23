@@ -14,7 +14,6 @@ import javax.ws.rs.core.NewCookie;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.map.DeserializationConfig.Feature;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.mule.api.ConnectionException;
@@ -32,7 +31,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class DrupalRestClient implements DrupalClient {
@@ -136,26 +134,18 @@ public class DrupalRestClient implements DrupalClient {
 
 	@Override
 	public Node createNode(Node node) throws IOException {
-		// Hack to add HAL links - until Drupal 8 allow posting with straight
-		// json.
+		// Hack to add HAL links - until Drupal 8 allow posting std json.
 		Map<String, Object> _links = new HashMap<String, Object>();
 		Map<String, Object> type = new HashMap<String, Object>();
 		type.put("href", "http://" + host + "/rest/type/node/" + node.getType());
 		_links.put("type", type);
 		node.setAdditionalProperties("_links", _links);
 
-		// Manually render JSON because of HAL.
-		StringWriter w = new StringWriter();
-		mapper.writeValue(new JsonFactory().createJsonGenerator(w), node);
-		w.close();
-
-		String s = w.toString();
-
-		ClientResponse clientResponse = webResource.path("entity/node/")
+		ClientResponse clientResponse = webResource.path("entity/node")
 				.header("Accept", "application/hal+json")
 				.header("X-CSRF-Token", csrfToken).cookie(sessionId)
 				.header("Content-type", "application/hal+json")
-				.post(ClientResponse.class, s);
+				.post(ClientResponse.class, toJson(node));
 
 		Status status = clientResponse.getClientResponseStatus();
 		URI location = clientResponse.getLocation();
@@ -174,31 +164,27 @@ public class DrupalRestClient implements DrupalClient {
 
 	@Override
 	public Node updateNode(Node node) throws IOException {
-		// Hack to add HAL links - until Drupal 8 allow posting with straight
-		// json.
+		// Hack to add HAL links - until Drupal 8 allow posting std json.
 		Map<String, Object> _links = new HashMap<String, Object>();
 		Map<String, Object> type = new HashMap<String, Object>();
 		type.put("href", "http://" + host + "/rest/type/node/" + node.getType());
 		_links.put("type", type);
 		node.setAdditionalProperties("_links", _links);
 
-		StringWriter w = new StringWriter();
-		mapper.writeValue(new JsonFactory().createJsonGenerator(w), node);
-		w.close();
-
-		String s = w.toString();
-
-		System.out.println("request " + s);
-		ClientResponse response = webResource.path("entity").path("node")
-				.path(node.getNid()).queryParam("HttpMethod", "PATCH")
+		ClientResponse clientResponse = webResource.path("entity").path("node")
+				.path(node.getNid()).header("X-HTTP-Method-Override", "PATCH")
 				.header("Accept", "application/hal+json")
 				.header("X-CSRF-Token", csrfToken).cookie(sessionId)
 				.header("Content-type", "application/hal+json")
-				.method("POST", ClientResponse.class, s);
-		
-		System.out.println("response " + response.getStatus() + response.getEntity(String.class));
+				.post(ClientResponse.class, toJson(node));
 
-		return null;
+		Status status = clientResponse.getClientResponseStatus();
+		if (status == Status.NO_CONTENT) {
+			return node;
+		} else {
+			throw new IOException("Could not update Node. Got status: "
+					+ clientResponse.getStatus());
+		}
 	}
 
 	@Override
@@ -225,8 +211,15 @@ public class DrupalRestClient implements DrupalClient {
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(module);
-		mapper.configure(Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 		return mapper;
+	}
+
+	public String toJson(Object entity) throws IOException {
+		StringWriter w = new StringWriter();
+		mapper.writeValue(new JsonFactory().createJsonGenerator(w), entity);
+		w.close();
+
+		return w.toString();
 	}
 
 }

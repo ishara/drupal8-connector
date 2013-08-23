@@ -7,7 +7,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertNotNull;
@@ -23,31 +25,33 @@ import org.mule.modules.drupal8.model.User;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 
 public class Drupal8ConnectorTest extends FunctionalTestCase {
 
 	@Rule
-	public WireMockRule wireMockRule = new WireMockRule(8080);
+	public WireMockClassRule wireMockRule = new WireMockClassRule(8888);
 
 	@Override
 	protected String getConfigResources() {
 		return "mule-config.xml";
 	}
 	
-//	@Before
-//	public void setupStubs(){
-//		stubFor(post(
-//				urlEqualTo("/user"))
-//				.willReturn(aResponse().withStatus(302).withHeader("Set-Cookie", "SESSION:XXX;Path=/")));
-//	}
+	@Before
+	public void setupStubs(){
+		stubFor(post(
+				urlEqualTo("/user"))
+				.willReturn(aResponse().withStatus(302).withHeader("Set-Cookie", "SESSION:XXX;Path=/")));
+		stubFor(get(
+				urlEqualTo("/rest/session/token"))
+				.willReturn(aResponse().withStatus(200).withBody("csrdftoken")));
+	}
 
 	@Test
 	public void testGetNode() throws Exception {
-//		stubFor(get(
-//				urlMatching("/entity/node/[0-9]+"))
-//				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
-//		
+		stubFor(get(
+				urlMatching("/entity/node/[0-9]+"))
+				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));	
 		
 		Flow flow = lookupFlowConstruct("getNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -60,10 +64,12 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 
 	@Test
 	public void testCreateNode() throws Exception {
-//		stubFor(post(
-//				urlEqualTo("/entity/node"))
-//				.willReturn(aResponse().withStatus(201).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
-//		
+		stubFor(post(
+				urlEqualTo("/entity/node"))
+				.willReturn(aResponse().withStatus(201).withHeader("Location", "http://localhost:8888/entity/node/1")));	
+		stubFor(get(
+				urlMatching("/entity/node/[0-9]+"))
+				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));	
 		
 		Flow flow = lookupFlowConstruct("createNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -76,10 +82,10 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 	
 	@Test
 	public void testUpdateNode() throws Exception {
-//		stubFor(post(
-//				urlEqualTo("/entity/node"))
-//				.willReturn(aResponse().withStatus(201).withBody(IOUtils.getResourceAsString("json/get-node-response.json", this.getClass()))));
-//		
+		stubFor(any(
+				urlMatching("/entity/node/[0-9]+")).withHeader("X-HTTP-Method-Override", equalTo("PATCH"))
+				.atPriority(1)
+				.willReturn(aResponse().withStatus(204)));		
 		
 		Flow flow = lookupFlowConstruct("updateNode");
 		MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -89,34 +95,34 @@ public class Drupal8ConnectorTest extends FunctionalTestCase {
 		assertNotNull(responseEvent.getMessage().getPayload());
 		assertTrue(responseEvent.getMessage().getPayload() instanceof Node);
 	}
-//
-//	@Test
-//	public void testDeleteNode() throws Exception {
-//		stubFor(delete(
-//				urlMatching("/entity/node/[0-9]+"))
-//				.willReturn(aResponse().withStatus(204)));
-//		
-//		Flow flow = lookupFlowConstruct("deleteNode");
-//		MuleEvent event = FunctionalTestCase.getTestEvent(null);
-//		MuleEvent responseEvent = flow.process(event);
-//		
-//		assertNotNull(responseEvent);
-//	}
-//
-//	@Test
-//	public void testGetUser() throws Exception {
-//		stubFor(get(
-//				urlMatching("/entity/user/[0-9]+"))
-//				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-user-response.json", this.getClass()))));
-//		
-//		Flow flow = lookupFlowConstruct("getUser");
-//		MuleEvent event = FunctionalTestCase.getTestEvent(null);
-//		MuleEvent responseEvent = flow.process(event);
-//		
-//		assertNotNull(responseEvent);
-//		assertNotNull(responseEvent.getMessage().getPayload());
-//		assertTrue(responseEvent.getMessage().getPayload() instanceof User);
-//	}
+
+	@Test
+	public void testDeleteNode() throws Exception {
+		stubFor(delete(
+				urlMatching("/entity/node/[0-9]+"))
+				.willReturn(aResponse().withStatus(204)));
+		
+		Flow flow = lookupFlowConstruct("deleteNode");
+		MuleEvent event = FunctionalTestCase.getTestEvent(null);
+		MuleEvent responseEvent = flow.process(event);
+		
+		assertNotNull(responseEvent);
+	}
+
+	@Test
+	public void testGetUser() throws Exception {
+		stubFor(get(
+				urlMatching("/entity/user/[0-9]+"))
+				.willReturn(aResponse().withStatus(200).withBody(IOUtils.getResourceAsString("json/get-user-response.json", this.getClass()))));
+		
+		Flow flow = lookupFlowConstruct("getUser");
+		MuleEvent event = FunctionalTestCase.getTestEvent(null);
+		MuleEvent responseEvent = flow.process(event);
+		
+		assertNotNull(responseEvent);
+		assertNotNull(responseEvent.getMessage().getPayload());
+		assertTrue(responseEvent.getMessage().getPayload() instanceof User);
+	}
 
 	/**
 	 * Retrieve a flow by name from the registry
