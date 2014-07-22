@@ -27,7 +27,7 @@ import org.mule.modules.drupal8.model.User;
  * 
  * @author MuleSoft, Inc.
  */
-@Connector(name = "drupal8", schemaVersion = "1.0-SNAPSHOT")
+@Connector(name = "drupal8", friendlyName =  "drupal8", schemaVersion = "1.0-SNAPSHOT")
 public class Drupal8Connector {
 
 	/**
