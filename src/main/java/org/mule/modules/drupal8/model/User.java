@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -85,8 +83,6 @@ public class User extends DrupalEntity {
 	
 	@JsonProperty("user_picture")
 	private List<UserPicture> user_picture = new ArrayList<UserPicture>();
-	
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
 	public String getUid() {
 		return uid;
@@ -206,16 +202,6 @@ public class User extends DrupalEntity {
 
 	public void setUser_picture(List<UserPicture> user_picture) {
 		this.user_picture = user_picture;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperties(String name, Object value) {
-		this.additionalProperties.put(name, value);
 	}
 
 }

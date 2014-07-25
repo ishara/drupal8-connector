@@ -1,225 +1,91 @@
 package org.mule.modules.drupal8.client.impl;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NewCookie;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.mule.api.ConnectionException;
-import org.mule.api.ConnectionExceptionCode;
 import org.mule.modules.drupal8.client.DrupalClient;
-import org.mule.modules.drupal8.model.DrupalEntity;
+import org.mule.modules.drupal8.client.auth.AuthenticationStrategy;
 import org.mule.modules.drupal8.model.Node;
 import org.mule.modules.drupal8.model.User;
-import org.mule.modules.drupal8.model.mapper.ItemDeserializer;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-public class DrupalRestClient implements DrupalClient {
+public class DrupalRestClient implements DrupalClient
+{
+    private static final String HTTP_HEADER_METHOD_OVERRIDE = "X-HTTP-Method-Override";
+    private static final String HTTP_METHOD_PATCH = "PATCH";
+    private static final String MEDIA_TYPE_HAL_JSON = "application/hal+json";
 
-	private NewCookie sessionId;
+    protected Client client;
+    protected WebResource webResource;
 
-	private String csrfToken;
+    private String endpoint;
 
-	protected Client client;
-	protected ObjectMapper mapper;
-	protected WebResource webResource;
+    public DrupalRestClient(String endpoint, AuthenticationStrategy auth)
+            throws DrupalException
+    {
+        this.endpoint = endpoint;
 
-	private String host;
-	private int port;
+        ClientConfig clientConfig = new DefaultClientConfig();
+        clientConfig.getClasses().add(DrupalHalProvider.class);
+        client = Client.create(clientConfig);
+        client = auth.authenticateClient(client);
+        webResource = client.resource(endpoint);
+    }
 
-	public DrupalRestClient(String host, int port) {
-		this.host = host;
-		this.port = port;
-		this.mapper = setupObjectMapper();
+    @Override
+    public Node getNode(String nodeId) throws IOException
+    {
+        return webResource.path("entity").path("node").path(nodeId)
+                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON).get(Node.class);
+    }
 
-		ClientConfig clientConfig = new DefaultClientConfig();
-		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-				Boolean.TRUE);
-		clientConfig.getClasses().add(JacksonJsonProvider.class);
+    @Override
+    public void createNode(Node node) throws IOException
+    {
+        node.setAdditionalProperties("_links", getHALProperties(endpoint
+                + "/rest/type/node/" + node.getType()));
 
-		this.client = Client.create(clientConfig);
-		this.client.setFollowRedirects(false);
-	}
+        webResource.path("entity").path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
+    }
 
-	@Override
-	public void login(String username, String password)
-			throws ConnectionException {
-		try {
-			this.webResource = client.resource(new URI("http", null, host,
-					port, null, null, null));
-		} catch (URISyntaxException e) {
-			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN,
-					null, "Drupal URI Invalid");
-		}
+    @Override
+    public void updateNode(Node node) throws IOException
+    {
+        webResource.path("entity").path("node").path(node.getNid())
+                .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
+                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
+    }
 
-		MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-		formData.add("name", username);
-		formData.add("pass", password);
-		formData.add("form_id", "user_login_form");
+    @Override
+    public void deleteNode(String nodeId) throws IOException
+    {
+        webResource.path("entity").path("node").path(nodeId).delete();
+    }
 
-		ClientResponse response = webResource.path("user")
-				.type(MediaType.APPLICATION_FORM_URLENCODED)
-				.post(ClientResponse.class, formData);
+    @Override
+    public User getUser(String userId) throws IOException
+    {
+        return webResource.path("entity").path("user").path(userId)
+                .accept(MediaType.APPLICATION_JSON_TYPE).get(User.class);
+    }
 
-		Status status = response.getClientResponseStatus();
-		if (status == Status.OK || status == Status.FOUND) {
-			String entity = response.getEntity(String.class);
-			if (!response.getCookies().isEmpty()) {
-				// Set Session ID
-				this.sessionId = response.getCookies().get(0);
-				// Get CSRF token
-				this.csrfToken = webResource.path("rest/session/token")
-						.cookie(sessionId).get(String.class);
-			} else {
-				throw new ConnectionException(ConnectionExceptionCode.UNKNOWN,
-						entity, "Drupal Rejected Login");
-			}
-		} else if (status == Status.UNAUTHORIZED) {
-			throw new ConnectionException(
-					ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, null);
-		} else {
-			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,
-					null, null);
-		}
-	}
-
-	@Override
-	public void logout() throws ConnectionException {
-		webResource.path("user").path("logout")
-				.type(MediaType.APPLICATION_FORM_URLENCODED).cookie(sessionId)
-				.post(ClientResponse.class, null);
-
-		this.client = null;
-		this.sessionId = null;
-	}
-
-	@Override
-	public boolean isConnected() {
-		return client != null && sessionId != null
-				&& sessionId.getValue() != null;
-	}
-
-	@Override
-	public String connectionId() {
-		return this.sessionId.toString();
-	}
-
-	@Override
-	public Node getNode(String nodeId) throws IOException {
-		String response = webResource.path("entity").path("node").path(nodeId)
-				.cookie(sessionId).header("Accept", "application/hal+json")
-				.get(String.class);
-
-		return mapper.readValue(response, Node.class);
-	}
-
-	@Override
-	public Node createNode(Node node) throws IOException {
-		// Hack to add HAL links - until Drupal 8 allow posting std json.
-		Map<String, Object> _links = new HashMap<String, Object>();
-		Map<String, Object> type = new HashMap<String, Object>();
-		type.put("href", "http://" + host + "/rest/type/node/" + node.getType());
-		_links.put("type", type);
-		node.setAdditionalProperties("_links", _links);
-
-		ClientResponse clientResponse = webResource.path("entity/node")
-				.header("Accept", "application/hal+json")
-				.header("X-CSRF-Token", csrfToken).cookie(sessionId)
-				.header("Content-type", "application/hal+json")
-				.post(ClientResponse.class, toJson(node));
-
-		Status status = clientResponse.getClientResponseStatus();
-		URI location = clientResponse.getLocation();
-		if (status == Status.CREATED && location != null) {
-			String response = webResource.path(location.getPath())
-					.cookie(sessionId).header("Accept", "application/hal+json")
-					.get(String.class);
-			return mapper.readValue(response, Node.class);
-
-		} else {
-			throw new IOException("Could not create Node. Got status: "
-					+ clientResponse.getStatus());
-		}
-
-	}
-
-	@Override
-	public Node updateNode(Node node) throws IOException {
-		// Hack to add HAL links - until Drupal 8 allow posting std json.
-		Map<String, Object> _links = new HashMap<String, Object>();
-		Map<String, Object> type = new HashMap<String, Object>();
-		type.put("href", "http://" + host + "/rest/type/node/" + node.getType());
-		_links.put("type", type);
-		node.setAdditionalProperties("_links", _links);
-
-		ClientResponse clientResponse = webResource.path("entity").path("node")
-				.path(node.getNid()).header("X-HTTP-Method-Override", "PATCH")
-				.header("Accept", "application/hal+json")
-				.header("X-CSRF-Token", csrfToken).cookie(sessionId)
-				.header("Content-type", "application/hal+json")
-				.post(ClientResponse.class, toJson(node));
-
-		Status status = clientResponse.getClientResponseStatus();
-		if (status == Status.NO_CONTENT) {
-			return node;
-		} else {
-			throw new IOException("Could not update Node. Got status: "
-					+ clientResponse.getStatus());
-		}
-	}
-
-	@Override
-	public void deleteNode(String nodeId) throws IOException {
-		webResource.path("entity").path("node").path(nodeId).cookie(sessionId)
-				.delete(ClientResponse.class);
-	}
-
-	@Override
-	public User getUser(String userId) throws IOException {
-		String response = webResource.path("entity").path("user").path(userId)
-				.accept(MediaType.APPLICATION_JSON_TYPE).cookie(sessionId)
-				.get(String.class);
-
-		return mapper.readValue(response, User.class);
-	}
-
-	public ObjectMapper setupObjectMapper() {
-		ItemDeserializer deserializer = new ItemDeserializer();
-		deserializer.registerItem("nid", Node.class);
-		SimpleModule module = new SimpleModule(
-				"PolymorphicItemDeserializerModule", new Version(1, 0, 0, null));
-		module.addDeserializer(DrupalEntity.class, deserializer);
-
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(module);
-		return mapper;
-	}
-
-	public String toJson(Object entity) throws IOException {
-		StringWriter w = new StringWriter();
-		mapper.writeValue(new JsonFactory().createJsonGenerator(w), entity);
-		w.close();
-
-		return w.toString();
-	}
+    private Map<String, Object> getHALProperties(String link)
+    {
+        Map<String, Object> _links = new HashMap<String, Object>();
+        Map<String, Object> type = new HashMap<String, Object>();
+        type.put("href", link);
+        _links.put("type", type);
+        return _links;
+    }
 
 }

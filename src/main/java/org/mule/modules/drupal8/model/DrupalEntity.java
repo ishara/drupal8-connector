@@ -69,16 +69,15 @@ public class DrupalEntity {
 		return created;
 	}
 
-
 	public void setCreated(String created) {
 		this.created = created;
 	}
 
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalProps() {
+        return this.additionalProperties;
+    }
+    
 	@JsonAnySetter
 	public void setAdditionalProperties(String name, Object value) {
 		this.additionalProperties.put(name, value);

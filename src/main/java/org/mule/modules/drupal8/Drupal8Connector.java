@@ -15,10 +15,9 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.param.ConnectionKey;
-import org.mule.api.annotations.param.Default;
-import org.mule.api.annotations.param.Optional;
 import org.mule.modules.drupal8.client.DrupalClient;
 import org.mule.modules.drupal8.client.DrupalClientFactory;
+import org.mule.modules.drupal8.client.impl.auth.CookieAuthenticationStrategy;
 import org.mule.modules.drupal8.model.Node;
 import org.mule.modules.drupal8.model.User;
 
@@ -27,159 +26,143 @@ import org.mule.modules.drupal8.model.User;
  * 
  * @author MuleSoft, Inc.
  */
-@Connector(name = "drupal8", friendlyName =  "drupal8", schemaVersion = "1.0-SNAPSHOT")
-public class Drupal8Connector {
+@Connector(name = "drupal8", friendlyName = "drupal8", schemaVersion = "1.0-SNAPSHOT")
+public class Drupal8Connector
+{
 
-	/**
-	 * Drupal host
-	 */
-	@Configurable
-	@Optional
-	@Default(value="localhost")
-	private String host;
+    /**
+     * Drupal endpoint
+     */
+    @Configurable
+    private String endpoint;
+    
+    private DrupalClient client;
 
-	/**
-	 * Drupal port
-	 */
-	@Configurable
-	@Optional
-	@Default(value="80")
-	private int port;
-	
-	private DrupalClient client;
+    @Connect
+    public void connect(@ConnectionKey String username,
+            @Password String password) throws ConnectionException {
+        this.client = DrupalClientFactory.getClient(endpoint, new CookieAuthenticationStrategy(username, password, endpoint + "/user"));
+    }
 
-	/**
-	 * Connect
-	 * 
-	 * @param username
-	 *            drupal username
-	 * @param password
-	 *            drupal password
-	 * @throws ConnectionException
-	 */
-	@Connect
-	public void connect(@ConnectionKey String username,
-			@Password String password) throws ConnectionException {
-		this.client = DrupalClientFactory.getClient(host, port);
-		this.client.login(username, password);
-	}
+    /**
+     * Disconnect
+     * 
+     * @throws ConnectionException 
+     */
+    @Disconnect
+    public void disconnect() throws ConnectionException {
+        
+    }
 
-	/**
-	 * Disconnect
-	 * 
-	 * @throws ConnectionException 
-	 */
-	@Disconnect
-	public void disconnect() throws ConnectionException {
-		this.client.logout();
-	}
+    /**
+     * Are we connected
+     */
+    @ValidateConnection
+    public boolean isConnected() {
+        return this.client != null;
+    }
 
-	/**
-	 * Are we connected
-	 */
-	@ValidateConnection
-	public boolean isConnected() {
-		return this.client != null && this.client.isConnected();
-	}
+    /**
+     * Are we connected
+     */
+    @ConnectionIdentifier
+    public String connectionId() {
+        return this.client.toString();
+    }
+    
+    /**
+     * Get a Node by a id
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-node}
+     * 
+     * @param nodeId
+     *            Id of drupal node
+     * @return Node
+     * @throws IOException
+     *             exception
+     */
+    @Processor
+    public Node getNode(String nodeId) throws IOException
+    {
+        return this.client.getNode(nodeId);
+    }
 
-	/**
-	 * Are we connected
-	 */
-	@ConnectionIdentifier
-	public String connectionId() {
-		return this.client.connectionId();
-	}
+    /**
+     * Create a new Node
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-node}
+     * 
+     * @param node
+     *            Node to create
+     * @return Node
+     * @throws IOException
+     *             exception
+     */
+    @Processor
+    public void createNode(Node node) throws IOException
+    {
+        this.client.createNode(node);
+    }
 
-	/**
-	 * Get a Node by a id
-	 * 
-	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-node}
-	 * 
-	 * @param nodeId
-	 *            Id of drupal node
-	 * @return Node
-	 * @throws IOException exception
-	 */
-	@Processor
-	public Node getNode(String nodeId) throws IOException {
-		return this.client.getNode(nodeId);		
-	}
-	
-	/**
-	 * Create a new Node
-	 * 
-	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-node}
-	 *
-	 * @param node
-	 *            Node to create
-	 * @return Node
-	 * @throws IOException exception
-	 */
-	@Processor
-	public Node createNode(Node node) throws IOException {
-		return this.client.createNode(node);
-	}
-	
-	/**
-	 * Update an existing Node
-	 * 
-	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:update-node}
-	 *
-	 * @param node
-	 *            Node to update
-	 * @return Node
-	 * @throws IOException exception
-	 */
-	@Processor
-	public Node updateNode(Node node) throws IOException {
-		return this.client.updateNode(node);
-	}
-	
-	/**
-	 * Delete a Node by a id
-	 * 
-	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:delete-node}
-	 * 
-	 * @param nodeId
-	 *            Id of drupal node
-	 * @return Node
-	 * @throws IOException exception
-	 */
-	@Processor
-	public void deleteNode(String nodeId) throws IOException {
-		this.client.deleteNode(nodeId);		
-	}
+    /**
+     * Update an existing Node
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:update-node}
+     * 
+     * @param node
+     *            Node to update
+     * @return Node
+     * @throws IOException
+     *             exception
+     */
+    @Processor
+    public void updateNode(Node node) throws IOException
+    {
+        this.client.updateNode(node);
+    }
 
-	/**
-	 * Get a User by a id
-	 * 
-	 * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-user}
-	 * 
-	 * @param userId
-	 *            Id of a drupal user
-	 * @return User
-	 * @throws IOException
-	 *             connection
-	 */
-	@Processor
-	public User getUser(String userId) throws IOException {
-		return this.client.getUser(userId);
-	}
+    /**
+     * Delete a Node by a id
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:delete-node}
+     * 
+     * @param nodeId
+     *            Id of drupal node
+     * @return Node
+     * @throws IOException
+     *             exception
+     */
+    @Processor
+    public void deleteNode(String nodeId) throws IOException
+    {
+        this.client.deleteNode(nodeId);
+    }
 
-	public int getPort() {
-		return port;
-	}
+    /**
+     * Get a User by a id
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-user}
+     * 
+     * @param userId
+     *            Id of a drupal user
+     * @return User
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public User getUser(String userId) throws IOException
+    {
+        return this.client.getUser(userId);
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public String getEndpoint()
+    {
+        return endpoint;
+    }
 
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
+    public void setEndpoint(String endpoint)
+    {
+        this.endpoint = endpoint;
+    }
 
 }
