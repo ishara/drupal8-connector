@@ -65,7 +65,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     public void testGetNode() throws Exception
     {
 
-        stubFor(get(urlMatching("/entity/node/[0-9]+")).willReturn(
+        stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
                 aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/hal+json")
                         .withStatus(200)
@@ -77,7 +77,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         MuleEvent responseEvent = flow.process(event);
 
-        verify(getRequestedFor(urlMatching("/entity/node/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
+        verify(getRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
                 equalTo("application/hal+json")).withHeader(HttpHeaders.COOKIE,
                 equalTo("SESSION:XXX=;Version=1;Path=/")));
 
@@ -87,10 +87,10 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testCreateNode() throws Exception
     {
-        stubFor(post(urlEqualTo("/entity/node")).willReturn(
+        stubFor(post(urlEqualTo("/node")).willReturn(
                 aResponse().withStatus(201).withHeader("Location",
-                        "http://localhost:8888/entity/node/1")));
-        stubFor(get(urlMatching("/entity/node/[0-9]+")).willReturn(
+                        "http://localhost:8888/node/1")));
+        stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
                 aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/hal+json")
@@ -102,7 +102,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlEqualTo("/entity/node")).withHeader(HttpHeaders.ACCEPT,
+        verify(postRequestedFor(urlEqualTo("/node")).withHeader(HttpHeaders.ACCEPT,
                 equalTo("application/hal+json")).withRequestBody(
                 equalTo(IOUtils.getResourceAsString("json/create-node-request.json",
                         this.getClass()).replace("{drupal.port}",
@@ -112,7 +112,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testUpdateNode() throws Exception
     {
-        stubFor(any(urlMatching("/entity/node/[0-9]+"))
+        stubFor(any(urlMatching("/node/[0-9]+"))
                 .withHeader("X-HTTP-Method-Override", equalTo("PATCH")).atPriority(1)
                 .willReturn(aResponse().withStatus(204)));
 
@@ -120,7 +120,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlMatching("/entity/node/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
+        verify(postRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
                 equalTo("application/hal+json")).withHeader("X-HTTP-Method-Override",
                 equalTo("PATCH")));
     }
@@ -128,13 +128,13 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testDeleteNode() throws Exception
     {
-        stubFor(delete(urlMatching("/entity/node/[0-9]+")).willReturn(aResponse().withStatus(204)));
+        stubFor(delete(urlMatching("/node/[0-9]+")).willReturn(aResponse().withStatus(204)));
 
         Flow flow = lookupFlowConstruct("deleteNode");
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         MuleEvent responseEvent = flow.process(event);
 
-        verify(deleteRequestedFor(urlMatching("/entity/node/[0-9]+")));
+        verify(deleteRequestedFor(urlMatching("/node/[0-9]+")));
 
         assertThat(responseEvent.getMessage().getPayload(), is(not(nullValue())));
     }
@@ -142,7 +142,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testGetUser() throws Exception
     {
-        stubFor(get(urlMatching("/entity/user/[0-9]+")).willReturn(
+        stubFor(get(urlMatching("/user/[0-9]+")).willReturn(
                 aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/hal+json")

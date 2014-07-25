@@ -43,7 +43,7 @@ public class DrupalRestClient implements DrupalClient
     @Override
     public Node getNode(String nodeId) throws IOException
     {
-        return webResource.path("entity").path("node").path(nodeId)
+        return webResource.path("node").path(nodeId)
                 .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON).get(Node.class);
     }
 
@@ -53,14 +53,14 @@ public class DrupalRestClient implements DrupalClient
         node.setAdditionalProperties("_links", getHALProperties(endpoint
                 + "/rest/type/node/" + node.getType()));
 
-        webResource.path("entity").path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+        webResource.path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
     }
 
     @Override
     public void updateNode(Node node) throws IOException
     {
-        webResource.path("entity").path("node").path(node.getNid())
+        webResource.path("node").path(node.getNid())
                 .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
                 .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
@@ -69,13 +69,13 @@ public class DrupalRestClient implements DrupalClient
     @Override
     public void deleteNode(String nodeId) throws IOException
     {
-        webResource.path("entity").path("node").path(nodeId).delete();
+        webResource.path("node").path(nodeId).delete();
     }
 
     @Override
     public User getUser(String userId) throws IOException
     {
-        return webResource.path("entity").path("user").path(userId)
+        return webResource.path("user").path(userId)
                 .accept(MediaType.APPLICATION_JSON_TYPE).get(User.class);
     }
 
