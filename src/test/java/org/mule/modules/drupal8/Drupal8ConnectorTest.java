@@ -87,7 +87,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testCreateNode() throws Exception
     {
-        stubFor(post(urlEqualTo("/node")).willReturn(
+        stubFor(post(urlEqualTo("/entity/node")).willReturn(
                 aResponse().withStatus(201).withHeader("Location",
                         "http://localhost:8888/node/1")));
         stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
@@ -102,7 +102,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlEqualTo("/node")).withHeader(HttpHeaders.ACCEPT,
+        verify(postRequestedFor(urlEqualTo("/entity/node")).withHeader(HttpHeaders.ACCEPT,
                 equalTo("application/hal+json")).withRequestBody(
                 equalTo(IOUtils.getResourceAsString("json/create-node-request.json",
                         this.getClass()).replace("{drupal.port}",

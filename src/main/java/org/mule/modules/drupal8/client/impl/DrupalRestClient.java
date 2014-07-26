@@ -53,7 +53,7 @@ public class DrupalRestClient implements DrupalClient
         node.setAdditionalProperties("_links", getHALProperties(endpoint
                 + "/rest/type/node/" + node.getType()));
 
-        webResource.path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+        webResource.path("entity").path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
     }
 
