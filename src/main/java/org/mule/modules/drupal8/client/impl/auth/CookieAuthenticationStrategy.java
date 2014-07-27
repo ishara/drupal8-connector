@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -32,7 +33,7 @@ public class CookieAuthenticationStrategy implements AuthenticationStrategy
     }
 
     @Override
-    public Client authenticateClient(Client client)
+    public void authenticateClient(Client client)
     {
         client.setFollowRedirects(false);
         WebResource webResource;
@@ -43,19 +44,22 @@ public class CookieAuthenticationStrategy implements AuthenticationStrategy
         {
             throw new DrupalException("Drupal URI Invalid", e);
         }
-        
-        
+
         client.addFilter(new ClientFilter() {
             private ArrayList<Object> cookies;
 
             @Override
-            public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-                if (cookies != null) {
-                    request.getHeaders().put("Cookie", cookies);
+            public ClientResponse handle(ClientRequest request) throws ClientHandlerException
+            {
+                if (cookies != null)
+                {
+                    request.getHeaders().put(HttpHeaders.COOKIE, cookies);
                 }
                 ClientResponse response = getNext().handle(request);
-                if (response.getCookies() != null) {
-                    if (cookies == null) {
+                if (response.getCookies() != null)
+                {
+                    if (cookies == null)
+                    {
                         cookies = new ArrayList<Object>();
                     }
                     cookies.addAll(response.getCookies());
@@ -71,8 +75,6 @@ public class CookieAuthenticationStrategy implements AuthenticationStrategy
 
         webResource.type(MediaType.APPLICATION_FORM_URLENCODED)
                 .post(ClientResponse.class, formData);
-        
-        return client;
 
     }
 }

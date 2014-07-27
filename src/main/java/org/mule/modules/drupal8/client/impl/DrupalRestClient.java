@@ -36,8 +36,8 @@ public class DrupalRestClient implements DrupalClient
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getClasses().add(DrupalHalProvider.class);
         client = Client.create(clientConfig);
-        client = auth.authenticateClient(client);
         webResource = client.resource(endpoint);
+        auth.authenticateClient(client);
     }
 
     @Override

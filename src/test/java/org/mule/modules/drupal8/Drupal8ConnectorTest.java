@@ -103,7 +103,8 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         flow.process(event);
 
         verify(postRequestedFor(urlEqualTo("/entity/node")).withHeader(HttpHeaders.ACCEPT,
-                equalTo("application/hal+json")).withRequestBody(
+                equalTo("application/hal+json")).withHeader(HttpHeaders.COOKIE,
+                        equalTo("SESSION:XXX=;Version=1;Path=/")).withRequestBody(
                 equalTo(IOUtils.getResourceAsString("json/create-node-request.json",
                         this.getClass()).replace("{drupal.port}",
                         String.valueOf(drupalPort.getNumber())))));
@@ -120,7 +121,8 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
+        verify(postRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")).withHeader(HttpHeaders.ACCEPT,
                 equalTo("application/hal+json")).withHeader("X-HTTP-Method-Override",
                 equalTo("PATCH")));
     }
@@ -134,7 +136,8 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         MuleEvent responseEvent = flow.process(event);
 
-        verify(deleteRequestedFor(urlMatching("/node/[0-9]+")));
+        verify(deleteRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")));
 
         assertThat(responseEvent.getMessage().getPayload(), is(not(nullValue())));
     }

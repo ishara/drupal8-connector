@@ -4,5 +4,5 @@ import com.sun.jersey.api.client.Client;
 
 public interface AuthenticationStrategy
 {
-    public Client authenticateClient(Client client); 
+    public void authenticateClient(Client client); 
 }
