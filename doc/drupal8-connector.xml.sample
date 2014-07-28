@@ -18,6 +18,10 @@
     <drupal8:delete-node nodeId="1"/>
 <!-- END_INCLUDE(drupal8:delete-node) -->
 
+<!-- BEGIN_INCLUDE(drupal8:get-view) -->
+    <drupal8:get-view viewPath="rest/views/articles" />
+<!-- END_INCLUDE(drupal8:get-view) -->
+
 <!-- BEGIN_INCLUDE(drupal8:get-user) -->
     <drupal8:get-user userId="1" />
 <!-- END_INCLUDE(drupal8:get-user) -->

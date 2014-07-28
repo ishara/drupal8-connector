@@ -2,6 +2,7 @@ package org.mule.modules.drupal8.client.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -9,10 +10,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.mule.modules.drupal8.client.DrupalClient;
 import org.mule.modules.drupal8.client.auth.AuthenticationStrategy;
+import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
 import org.mule.modules.drupal8.model.User;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -70,6 +73,12 @@ public class DrupalRestClient implements DrupalClient
     public void deleteNode(String nodeId) throws IOException
     {
         webResource.path("node").path(nodeId).delete();
+    }
+    
+    @Override
+    public List<DrupalEntity> getView(String viewPath){
+        return webResource.path(viewPath)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DrupalEntity>>() {});
     }
 
     @Override

@@ -18,9 +18,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +33,7 @@ import org.junit.Test;
 import org.mortbay.jetty.HttpHeaders;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
 import org.mule.modules.drupal8.model.User;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -88,8 +94,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     public void testCreateNode() throws Exception
     {
         stubFor(post(urlEqualTo("/entity/node")).willReturn(
-                aResponse().withStatus(201).withHeader("Location",
-                        "http://localhost:8888/node/1")));
+                aResponse().withStatus(201).withHeader("Location", "http://localhost:8888/node/1")));
         stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
                 aResponse()
                         .withStatus(200)
@@ -102,12 +107,13 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlEqualTo("/entity/node")).withHeader(HttpHeaders.ACCEPT,
-                equalTo("application/hal+json")).withHeader(HttpHeaders.COOKIE,
-                        equalTo("SESSION:XXX=;Version=1;Path=/")).withRequestBody(
-                equalTo(IOUtils.getResourceAsString("json/create-node-request.json",
-                        this.getClass()).replace("{drupal.port}",
-                        String.valueOf(drupalPort.getNumber())))));
+        verify(postRequestedFor(urlEqualTo("/entity/node"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo("application/hal+json"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withRequestBody(
+                        equalTo(IOUtils.getResourceAsString("json/create-node-request.json",
+                                this.getClass()).replace("{drupal.port}",
+                                String.valueOf(drupalPort.getNumber())))));
     }
 
     @Test
@@ -121,10 +127,10 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
         flow.process(event);
 
-        verify(postRequestedFor(urlMatching("/node/[0-9]+")).withHeader(HttpHeaders.COOKIE,
-                equalTo("SESSION:XXX=;Version=1;Path=/")).withHeader(HttpHeaders.ACCEPT,
-                equalTo("application/hal+json")).withHeader("X-HTTP-Method-Override",
-                equalTo("PATCH")));
+        verify(postRequestedFor(urlMatching("/node/[0-9]+"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo("application/hal+json"))
+                .withHeader("X-HTTP-Method-Override", equalTo("PATCH")));
     }
 
     @Test
@@ -142,6 +148,34 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         assertThat(responseEvent.getMessage().getPayload(), is(not(nullValue())));
     }
 
+    @Test
+    public void testGetView() throws Exception
+    {
+
+        stubFor(get(urlMatching("/rest/views/articles")).willReturn(
+                aResponse()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                        .withStatus(200)
+                        .withBody(
+                                IOUtils.getResourceAsString("json/node-view-response.json",
+                                        this.getClass()))));
+
+        Flow flow = lookupFlowConstruct("getView");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+
+        verify(getRequestedFor(urlMatching("/rest/views/articles")).withHeader(HttpHeaders.ACCEPT,
+                equalTo(MediaType.APPLICATION_JSON)).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")));
+
+        @SuppressWarnings("unchecked")
+        List<DrupalEntity> entities = (List<DrupalEntity>) responseEvent.getMessage().getPayload();
+
+        assertThat(entities.size(), is(equalTo(2)));
+
+        assertThat(entities.get(0), is(instanceOf(Node.class)));
+    }
+    
     @Test
     public void testGetUser() throws Exception
     {

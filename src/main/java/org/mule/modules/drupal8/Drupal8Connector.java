@@ -4,6 +4,7 @@
 package org.mule.modules.drupal8;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
@@ -18,6 +19,7 @@ import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.modules.drupal8.client.DrupalClient;
 import org.mule.modules.drupal8.client.DrupalClientFactory;
 import org.mule.modules.drupal8.client.impl.auth.CookieAuthenticationStrategy;
+import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
 import org.mule.modules.drupal8.model.User;
 
@@ -136,6 +138,23 @@ public class Drupal8Connector
     public void deleteNode(String nodeId) throws IOException
     {
         this.client.deleteNode(nodeId);
+    }
+    
+    /**
+     * Get the result of a custom view
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-view}
+     * 
+     * @param viewPath
+     *            the path of the custom view
+     * @return Node
+     * @throws IOException
+     *             exception
+     */
+    @Processor
+    public List<DrupalEntity> getView(String viewPath) throws IOException
+    {
+        return this.client.getView(viewPath);
     }
 
     /**
