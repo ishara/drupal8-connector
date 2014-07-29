@@ -23,37 +23,36 @@ http://${YOUR_DRUPAL}/admin/config/development/configuration/single/import
 
 And importing you rest.settings config similar to the following:
 
-  resources:
-    'entity:node':
-      GET:
-        supported_auth:
-          - basic_auth
-          - cookie
-        supported_formats:
-          - json
-          - hal_json
-      POST:
-        supported_formats:
-          - json
-          - hal_json
-  
-        supported_auth:
-          - basic_auth
-          - cookie
-      DELETE:
-        supported_auth:
-          - basic_auth
-          - cookie
-        supported_formats:
-          - json
-          - hal_json
-      PATCH:
-        supported_auth:
-          - basic_auth
-          - cookie
-        supported_formats:
-          - json
-          - hal_json
+    resources:
+      'entity:node':
+        GET:
+          supported_auth:
+            - basic_auth
+            - cookie
+          supported_formats:
+            - json
+            - hal_json
+        POST:
+          supported_formats:
+            - json
+            - hal_json
+          supported_auth:
+            - basic_auth
+            - cookie
+        DELETE:
+          supported_auth:
+            - basic_auth
+            - cookie
+          supported_formats:
+            - json
+            - hal_json
+        PATCH:
+          supported_auth:
+            - basic_auth
+            - cookie
+          supported_formats:
+            - json
+            - hal_json
 
 ![](https://github.com/ryandcarter/drupal8-connector/blob/master/doc/setting-import.png)
 
