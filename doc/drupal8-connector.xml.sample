@@ -37,3 +37,7 @@
        <drupal8:user uid="1" name="newuser" password="pass" mail="ryan@example.com" />
     </drupal8:update-user>
 <!-- END_INCLUDE(drupal8:update-user) -->
+
+<!-- BEGIN_INCLUDE(drupal8:delete-user) -->
+    <drupal8:delete-user uid="1" />
+<!-- END_INCLUDE(drupal8:delete-user) -->

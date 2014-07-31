@@ -108,6 +108,12 @@ public class DrupalRestClient implements DrupalClient
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(user);
     }
 
+    @Override
+    public void deleteUser(String uid)
+    {
+        webResource.path("user").path(uid).delete();
+    }
+
     private Map<String, Object> getHALProperties(String link)
     {
         Map<String, Object> _links = new HashMap<String, Object>();

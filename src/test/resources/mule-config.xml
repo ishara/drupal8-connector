@@ -52,4 +52,8 @@
 		</drupal8:update-user>
 	</flow>
 
+	<flow name="deleteUser">
+		<drupal8:delete-user uid="1" />
+	</flow>
+
 </mule>

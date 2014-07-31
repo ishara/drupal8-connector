@@ -222,6 +222,19 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
                 .withHeader("X-HTTP-Method-Override", equalTo("PATCH")));
     }
 
+    @Test
+    public void testDeleteUser() throws Exception
+    {
+        stubFor(delete(urlMatching("/user/[0-9]+")).willReturn(aResponse().withStatus(204)));
+
+        Flow flow = lookupFlowConstruct("deleteUser");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(deleteRequestedFor(urlMatching("/user/[0-9]+")).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")));
+    }
+
     /**
      * Retrieve a flow by name from the registry
      * 

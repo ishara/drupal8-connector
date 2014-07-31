@@ -37,30 +37,34 @@ public class Drupal8Connector
      */
     @Configurable
     private String endpoint;
-    
+
     private DrupalClient client;
 
     @Connect
-    public void connect(@ConnectionKey String username,
-            @Password String password) throws ConnectionException {
-        this.client = DrupalClientFactory.getClient(endpoint, new CookieAuthenticationStrategy(username, password, endpoint + "/user"));
+    public void connect(@ConnectionKey String username, @Password String password)
+            throws ConnectionException
+    {
+        this.client = DrupalClientFactory.getClient(endpoint, new CookieAuthenticationStrategy(
+                username, password, endpoint + "/user"));
     }
 
     /**
      * Disconnect
      * 
-     * @throws ConnectionException 
+     * @throws ConnectionException
      */
     @Disconnect
-    public void disconnect() throws ConnectionException {
-        
+    public void disconnect() throws ConnectionException
+    {
+
     }
 
     /**
      * Are we connected
      */
     @ValidateConnection
-    public boolean isConnected() {
+    public boolean isConnected()
+    {
         return this.client != null;
     }
 
@@ -68,10 +72,11 @@ public class Drupal8Connector
      * Are we connected
      */
     @ConnectionIdentifier
-    public String connectionId() {
+    public String connectionId()
+    {
         return this.client.toString();
     }
-    
+
     /**
      * Get a Node by a id
      * 
@@ -139,7 +144,7 @@ public class Drupal8Connector
     {
         this.client.deleteNode(nodeId);
     }
-    
+
     /**
      * Get the result of a custom view
      * 
@@ -173,7 +178,7 @@ public class Drupal8Connector
     {
         return this.client.getUser(userId);
     }
-    
+
     /**
      * Create a new User
      * 
@@ -190,7 +195,7 @@ public class Drupal8Connector
     {
         this.client.createUser(user);
     }
-    
+
     /**
      * Update an existing User
      * 
@@ -206,6 +211,23 @@ public class Drupal8Connector
     public void updateUser(User user) throws IOException
     {
         this.client.updateUser(user);
+    }
+
+    /**
+     * Delete an existing User
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:delete-user}
+     * 
+     * @param uid
+     *            The user id to to delete
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void deleteUser(String uid) throws IOException
+    {
+        this.client.deleteUser(uid);
     }
 
     public String getEndpoint()

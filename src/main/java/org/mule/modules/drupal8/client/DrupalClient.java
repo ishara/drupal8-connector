@@ -24,4 +24,6 @@ public interface DrupalClient
     public void createUser(User user) throws IOException;
 
     public void updateUser(User user) throws IOException;
+
+    public void deleteUser(String uid) throws IOException;
 }
