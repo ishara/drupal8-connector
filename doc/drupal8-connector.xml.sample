@@ -25,3 +25,15 @@
 <!-- BEGIN_INCLUDE(drupal8:get-user) -->
     <drupal8:get-user userId="1" />
 <!-- END_INCLUDE(drupal8:get-user) -->
+
+<!-- BEGIN_INCLUDE(drupal8:create-user) -->
+    <drupal8:create-user>
+       <drupal8:user name="newuser" password="pass" mail="ryan@example.com" />
+    </drupal8:create-user>
+<!-- END_INCLUDE(drupal8:create-user) -->
+
+<!-- BEGIN_INCLUDE(drupal8:update-user) -->
+    <drupal8:update-user>
+       <drupal8:user uid="1" name="newuser" password="pass" mail="ryan@example.com" />
+    </drupal8:update-user>
+<!-- END_INCLUDE(drupal8:update-user) -->

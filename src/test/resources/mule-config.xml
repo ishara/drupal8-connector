@@ -39,4 +39,17 @@
 		<drupal8:get-user userId="1" />
 	</flow>
 
+	<flow name="createUser">
+		<drupal8:create-user>
+			<drupal8:user name="newuser" password="pass" mail="ryan@example.com" />
+		</drupal8:create-user>
+	</flow>
+
+	<flow name="updateUser">
+		<drupal8:update-user>
+			<drupal8:user uid="1" name="newuser" password="pass"
+				mail="ryan@example.com" />
+		</drupal8:update-user>
+	</flow>
+
 </mule>

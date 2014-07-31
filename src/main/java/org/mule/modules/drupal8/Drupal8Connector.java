@@ -173,6 +173,40 @@ public class Drupal8Connector
     {
         return this.client.getUser(userId);
     }
+    
+    /**
+     * Create a new User
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-user}
+     * 
+     * @param user
+     *            The user to create
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void createUser(User user) throws IOException
+    {
+        this.client.createUser(user);
+    }
+    
+    /**
+     * Update an existing User
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:update-user}
+     * 
+     * @param user
+     *            The user to to update
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void updateUser(User user) throws IOException
+    {
+        this.client.updateUser(user);
+    }
 
     public String getEndpoint()
     {

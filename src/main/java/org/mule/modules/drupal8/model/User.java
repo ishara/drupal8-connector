@@ -9,10 +9,10 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.mule.modules.drupal8.model.mapper.WrapperDeserializer;
 import org.mule.modules.drupal8.model.mapper.WrapperSerializer;
 
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class User extends DrupalEntity {
-	
-	@JsonSerialize(using = WrapperSerializer.class, as = String.class, include=JsonSerialize.Inclusion.NON_NULL)
-	@JsonDeserialize(using = WrapperDeserializer.class, as = String.class)
+    @JsonSerialize(using = WrapperSerializer.class, as = String.class, include=JsonSerialize.Inclusion.NON_NULL)
+    @JsonDeserialize(using = WrapperDeserializer.class, as = String.class)
 	@JsonProperty("uid")
 	private String uid;
 	
@@ -183,7 +183,7 @@ public class User extends DrupalEntity {
 	}
 
 	public void setInit(String init) {
-		this.init = String.valueOf(init);
+		this.init = init;
 	}
 
 	public List<Role> getRoles() {

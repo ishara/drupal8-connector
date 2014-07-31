@@ -31,8 +31,7 @@ public class DrupalRestClient implements DrupalClient
 
     private String endpoint;
 
-    public DrupalRestClient(String endpoint, AuthenticationStrategy auth)
-            throws DrupalException
+    public DrupalRestClient(String endpoint, AuthenticationStrategy auth) throws DrupalException
     {
         this.endpoint = endpoint;
 
@@ -53,8 +52,8 @@ public class DrupalRestClient implements DrupalClient
     @Override
     public void createNode(Node node) throws IOException
     {
-        node.setAdditionalProperties("_links", getHALProperties(endpoint
-                + "/rest/type/node/" + node.getType()));
+        node.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/node/"
+                + node.getType()));
 
         webResource.path("entity").path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
@@ -74,18 +73,39 @@ public class DrupalRestClient implements DrupalClient
     {
         webResource.path("node").path(nodeId).delete();
     }
-    
+
     @Override
-    public List<DrupalEntity> getView(String viewPath){
+    public List<DrupalEntity> getView(String viewPath)
+    {
         return webResource.path(viewPath)
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DrupalEntity>>() {});
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_TYPE)
+                .get(new GenericType<List<DrupalEntity>>() {
+                });
     }
 
     @Override
     public User getUser(String userId) throws IOException
     {
-        return webResource.path("user").path(userId)
-                .accept(MediaType.APPLICATION_JSON_TYPE).get(User.class);
+        return webResource.path("user").path(userId).accept(MediaType.APPLICATION_JSON_TYPE)
+                .get(User.class);
+    }
+
+    @Override
+    public void createUser(User user) throws IOException
+    {
+        user.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/user/user"));
+
+        webResource.path("entity").path("user").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(user);
+    }
+
+    @Override
+    public void updateUser(User user)
+    {
+        webResource.path("user").path(user.getUid())
+                .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
+                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(user);
     }
 
     private Map<String, Object> getHALProperties(String link)

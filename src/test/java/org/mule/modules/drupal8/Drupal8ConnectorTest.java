@@ -16,9 +16,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -95,13 +95,6 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     {
         stubFor(post(urlEqualTo("/entity/node")).willReturn(
                 aResponse().withStatus(201).withHeader("Location", "http://localhost:8888/node/1")));
-        stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
-                aResponse()
-                        .withStatus(200)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/hal+json")
-                        .withBody(
-                                IOUtils.getResourceAsString("json/get-node-response.json",
-                                        this.getClass()))));
 
         Flow flow = lookupFlowConstruct("createNode");
         MuleEvent event = FunctionalTestCase.getTestEvent(null);
@@ -151,7 +144,6 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testGetView() throws Exception
     {
-
         stubFor(get(urlMatching("/rest/views/articles")).willReturn(
                 aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -175,7 +167,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
 
         assertThat(entities.get(0), is(instanceOf(Node.class)));
     }
-    
+
     @Test
     public void testGetUser() throws Exception
     {
@@ -192,6 +184,42 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent responseEvent = flow.process(event);
 
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(User.class)));
+    }
+
+    @Test
+    public void testCreateUser() throws Exception
+    {
+        stubFor(post(urlEqualTo("/entity/user")).willReturn(
+                aResponse().withStatus(201).withHeader("Location", "http://localhost:8888/user/1")));
+
+        Flow flow = lookupFlowConstruct("createUser");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(postRequestedFor(urlEqualTo("/entity/user"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo("application/hal+json"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withRequestBody(
+                        equalTo(IOUtils.getResourceAsString("json/create-user-request.json",
+                                this.getClass()).replace("{drupal.port}",
+                                String.valueOf(drupalPort.getNumber())))));
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception
+    {
+        stubFor(any(urlMatching("/user/[0-9]+"))
+                .withHeader("X-HTTP-Method-Override", equalTo("PATCH")).atPriority(1)
+                .willReturn(aResponse().withStatus(204)));
+
+        Flow flow = lookupFlowConstruct("updateUser");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(postRequestedFor(urlMatching("/user/[0-9]+"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo("application/hal+json"))
+                .withHeader("X-HTTP-Method-Override", equalTo("PATCH")));
     }
 
     /**
