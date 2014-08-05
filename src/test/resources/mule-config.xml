@@ -66,4 +66,7 @@
 		</drupal8:create-taxonomy-term>
 	</flow>
 
+	<flow name="deleteTaxonomyTerm">
+		<drupal8:delete-taxonomy-term termId="1" />
+	</flow>
 </mule>

@@ -232,7 +232,7 @@ public class Drupal8Connector
     }
     
     /**
-     * Get a Taxonomy Term by a id
+     * Get a taxonomy term by a id
      * 
      * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-taxonomy-term}
      * 
@@ -249,7 +249,7 @@ public class Drupal8Connector
     }
     
     /**
-     * Create a new Taxonomy Term
+     * Create a new taxonomy term
      * 
      * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-taxonomy-term}
      * 
@@ -263,6 +263,23 @@ public class Drupal8Connector
     public void createTaxonomyTerm(TaxonomyTerm term) throws IOException
     {
         this.client.createTaxonomyTerm(term);
+    }
+    
+    /**
+     * Delete an existing taxonomy term
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:delete-taxonomy-term}
+     * 
+     * @param uid
+     *            The term id to to delete
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void deleteTaxonomyTerm(String termId) throws IOException
+    {
+        this.client.deleteTaxonomyTerm(termId);
     }
     
     public String getEndpoint()

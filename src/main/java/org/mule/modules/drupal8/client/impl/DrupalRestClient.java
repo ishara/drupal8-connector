@@ -114,22 +114,30 @@ public class DrupalRestClient implements DrupalClient
     {
         webResource.path("user").path(uid).delete();
     }
-    
+
     @Override
     public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException
     {
-        return webResource.path("taxonomy/term").path(termId).accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(TaxonomyTerm.class);
+        return webResource.path("taxonomy/term").path(termId)
+                .accept(MediaType.APPLICATION_JSON_TYPE).get(TaxonomyTerm.class);
     }
 
     @Override
     public void createTaxonomyTerm(TaxonomyTerm term) throws IOException
     {
-        term.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/taxonomy_term/tags"));
+        term.setAdditionalProperties("_links", getHALProperties(endpoint
+                + "/rest/type/taxonomy_term/tags"));
 
-        webResource.path("entity").path("taxonomy_term").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+        webResource.path("entity").path("taxonomy_term")
+                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(term);
-        
+
+    }
+
+    @Override
+    public void deleteTaxonomyTerm(String termId) throws IOException
+    {
+        webResource.path("taxonomy/term").path(termId).delete();
     }
 
     private Map<String, Object> getHALProperties(String link)

@@ -275,6 +275,19 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
                                 this.getClass()).replace("{drupal.port}",
                                 String.valueOf(drupalPort.getNumber())))));
     }
+
+    @Test
+    public void testDeleteTaxonomyTerm() throws Exception
+    {
+        stubFor(delete(urlMatching("/taxonomy/term/[0-9]+")).willReturn(aResponse().withStatus(204)));
+
+        Flow flow = lookupFlowConstruct("deleteTaxonomyTerm");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(deleteRequestedFor(urlMatching("/taxonomy/term/[0-9]+")).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")));
+    }
     
     /**
      * Retrieve a flow by name from the registry

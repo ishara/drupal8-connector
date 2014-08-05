@@ -31,4 +31,6 @@ public interface DrupalClient
     public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException;
 
     public void createTaxonomyTerm(TaxonomyTerm term) throws IOException;
+    
+    public void deleteTaxonomyTerm(String termId) throws IOException;
 }
