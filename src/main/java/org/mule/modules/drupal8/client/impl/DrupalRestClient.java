@@ -122,6 +122,16 @@ public class DrupalRestClient implements DrupalClient
                 .get(TaxonomyTerm.class);
     }
 
+    @Override
+    public void createTaxonomyTerm(TaxonomyTerm term) throws IOException
+    {
+        term.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/taxonomy_term/tags"));
+
+        webResource.path("entity").path("taxonomy_term").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(term);
+        
+    }
+
     private Map<String, Object> getHALProperties(String link)
     {
         Map<String, Object> _links = new HashMap<String, Object>();

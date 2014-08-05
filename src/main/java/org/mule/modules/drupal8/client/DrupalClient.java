@@ -29,4 +29,6 @@ public interface DrupalClient
     public void deleteUser(String uid) throws IOException;
 
     public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException;
+
+    public void createTaxonomyTerm(TaxonomyTerm term) throws IOException;
 }

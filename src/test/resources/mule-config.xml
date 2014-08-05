@@ -60,4 +60,10 @@
 		<drupal8:get-taxonomy-term termId="1" />
 	</flow>
 
+	<flow name="createTaxonomyTerm">
+		<drupal8:create-taxonomy-term>
+			<drupal8:term name="newtag" weight="1" />
+		</drupal8:create-taxonomy-term>
+	</flow>
+
 </mule>

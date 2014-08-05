@@ -71,7 +71,6 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
     @Test
     public void testGetNode() throws Exception
     {
-
         stubFor(get(urlMatching("/node/[0-9]+")).willReturn(
                 aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/hal+json")
@@ -257,6 +256,26 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
 
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(TaxonomyTerm.class)));
     }
+    
+    @Test
+    public void testCreateTaxonomyTerm() throws Exception
+    {
+        stubFor(post(urlEqualTo("/entity/taxonomy_term")).willReturn(
+                aResponse().withStatus(201).withHeader("Location", "http://localhost:8888/taxonomy/term/1")));
+
+        Flow flow = lookupFlowConstruct("createTaxonomyTerm");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(postRequestedFor(urlEqualTo("/entity/taxonomy_term"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo("application/hal+json"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withRequestBody(
+                        equalTo(IOUtils.getResourceAsString("json/create-taxonomy-term-request.json",
+                                this.getClass()).replace("{drupal.port}",
+                                String.valueOf(drupalPort.getNumber())))));
+    }
+    
     /**
      * Retrieve a flow by name from the registry
      * 

@@ -247,7 +247,24 @@ public class Drupal8Connector
     {
         return this.client.getTaxonomyTerm(termId);
     }
-
+    
+    /**
+     * Create a new Taxonomy Term
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:create-taxonomy-term}
+     * 
+     * @param term
+     *            The taxonomy term to create
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void createTaxonomyTerm(TaxonomyTerm term) throws IOException
+    {
+        this.client.createTaxonomyTerm(term);
+    }
+    
     public String getEndpoint()
     {
         return endpoint;
