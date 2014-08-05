@@ -35,6 +35,7 @@ import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
+import org.mule.modules.drupal8.model.TaxonomyTerm;
 import org.mule.modules.drupal8.model.User;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -234,7 +235,28 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         verify(deleteRequestedFor(urlMatching("/user/[0-9]+")).withHeader(HttpHeaders.COOKIE,
                 equalTo("SESSION:XXX=;Version=1;Path=/")));
     }
+    
+    @Test
+    public void testGetTaxonomyTerm() throws Exception
+    {
+        stubFor(get(urlMatching("/taxonomy/term/[0-9]+")).willReturn(
+                aResponse()
+                        .withStatus(200)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                        .withBody(
+                                IOUtils.getResourceAsString("json/taxonomy-term-resource.json",
+                                        this.getClass()))));
 
+        Flow flow = lookupFlowConstruct("getTaxonomyTerm");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+
+        verify(getRequestedFor(urlMatching("/taxonomy/term/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
+                equalTo( MediaType.APPLICATION_JSON)).withHeader(HttpHeaders.COOKIE,
+                equalTo("SESSION:XXX=;Version=1;Path=/")));
+
+        assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(TaxonomyTerm.class)));
+    }
     /**
      * Retrieve a flow by name from the registry
      * 

@@ -12,6 +12,7 @@ import org.mule.modules.drupal8.client.DrupalClient;
 import org.mule.modules.drupal8.client.auth.AuthenticationStrategy;
 import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
+import org.mule.modules.drupal8.model.TaxonomyTerm;
 import org.mule.modules.drupal8.model.User;
 
 import com.sun.jersey.api.client.Client;
@@ -112,6 +113,13 @@ public class DrupalRestClient implements DrupalClient
     public void deleteUser(String uid)
     {
         webResource.path("user").path(uid).delete();
+    }
+    
+    @Override
+    public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException
+    {
+        return webResource.path("taxonomy/term").path(termId).accept(MediaType.APPLICATION_JSON_TYPE)
+                .get(TaxonomyTerm.class);
     }
 
     private Map<String, Object> getHALProperties(String link)

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
+import org.mule.modules.drupal8.model.TaxonomyTerm;
 import org.mule.modules.drupal8.model.User;
 
 public interface DrupalClient
@@ -26,4 +27,6 @@ public interface DrupalClient
     public void updateUser(User user) throws IOException;
 
     public void deleteUser(String uid) throws IOException;
+
+    public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException;
 }

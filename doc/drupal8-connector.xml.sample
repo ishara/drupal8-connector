@@ -41,3 +41,7 @@
 <!-- BEGIN_INCLUDE(drupal8:delete-user) -->
     <drupal8:delete-user uid="1" />
 <!-- END_INCLUDE(drupal8:delete-user) -->
+
+<!-- BEGIN_INCLUDE(drupal8:get-taxonomy-term) -->
+	<drupal8:get-taxonomy-term termId="1" />
+<!-- END_INCLUDE(drupal8:get-taxonomy-term) -->

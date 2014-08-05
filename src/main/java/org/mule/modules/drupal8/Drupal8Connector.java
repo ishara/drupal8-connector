@@ -21,6 +21,7 @@ import org.mule.modules.drupal8.client.DrupalClientFactory;
 import org.mule.modules.drupal8.client.impl.auth.CookieAuthenticationStrategy;
 import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
+import org.mule.modules.drupal8.model.TaxonomyTerm;
 import org.mule.modules.drupal8.model.User;
 
 /**
@@ -228,6 +229,23 @@ public class Drupal8Connector
     public void deleteUser(String uid) throws IOException
     {
         this.client.deleteUser(uid);
+    }
+    
+    /**
+     * Get a Taxonomy Term by a id
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:get-taxonomy-term}
+     * 
+     * @param termId
+     *            Id of a taxonomy term
+     * @return TaxonomyTerm
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException
+    {
+        return this.client.getTaxonomyTerm(termId);
     }
 
     public String getEndpoint()
