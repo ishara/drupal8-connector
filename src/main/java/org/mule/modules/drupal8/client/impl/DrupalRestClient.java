@@ -135,6 +135,15 @@ public class DrupalRestClient implements DrupalClient
     }
 
     @Override
+    public void updateTaxonomyTerm(TaxonomyTerm term) throws IOException
+    {
+        webResource.path("taxonomy/term").path(term.getTid())
+        .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
+        .header(HttpHeaders.ACCEPT,  MediaType.APPLICATION_JSON_TYPE)
+        .header(HttpHeaders.CONTENT_TYPE,  MediaType.APPLICATION_JSON_TYPE).post(term);
+    }
+
+    @Override
     public void deleteTaxonomyTerm(String termId) throws IOException
     {
         webResource.path("taxonomy/term").path(termId).delete();

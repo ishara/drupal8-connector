@@ -251,7 +251,7 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
         MuleEvent responseEvent = flow.process(event);
 
         verify(getRequestedFor(urlMatching("/taxonomy/term/[0-9]+")).withHeader(HttpHeaders.ACCEPT,
-                equalTo( MediaType.APPLICATION_JSON)).withHeader(HttpHeaders.COOKIE,
+                equalTo(MediaType.APPLICATION_JSON)).withHeader(HttpHeaders.COOKIE,
                 equalTo("SESSION:XXX=;Version=1;Path=/")));
 
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(TaxonomyTerm.class)));
@@ -276,6 +276,24 @@ public class Drupal8ConnectorTest extends FunctionalTestCase
                                 String.valueOf(drupalPort.getNumber())))));
     }
 
+
+    @Test
+    public void testUpdateTaxonomyTerm() throws Exception
+    {
+        stubFor(any(urlMatching("/taxonomy/term/[0-9]+"))
+                .withHeader("X-HTTP-Method-Override", equalTo("PATCH")).atPriority(1)
+                .willReturn(aResponse().withStatus(204)));
+
+        Flow flow = lookupFlowConstruct("updateTaxonomyTerm");
+        MuleEvent event = FunctionalTestCase.getTestEvent(null);
+        flow.process(event);
+
+        verify(postRequestedFor(urlMatching("/taxonomy/term/[0-9]+"))
+                .withHeader(HttpHeaders.COOKIE, equalTo("SESSION:XXX=;Version=1;Path=/"))
+                .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON))
+                .withHeader("X-HTTP-Method-Override", equalTo("PATCH")));
+    }
+    
     @Test
     public void testDeleteTaxonomyTerm() throws Exception
     {

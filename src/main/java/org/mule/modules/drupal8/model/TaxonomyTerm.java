@@ -11,6 +11,11 @@ public class TaxonomyTerm extends DrupalEntity
 {
     @JsonSerialize(using = WrapperSerializer.class, as = String.class, include = JsonSerialize.Inclusion.NON_NULL)
     @JsonDeserialize(using = WrapperDeserializer.class, as = String.class)
+    @JsonProperty("tid")
+    private String tid;
+
+    @JsonSerialize(using = WrapperSerializer.class, as = String.class, include = JsonSerialize.Inclusion.NON_NULL)
+    @JsonDeserialize(using = WrapperDeserializer.class, as = String.class)
     @JsonProperty("name")
     private String name;
 
@@ -18,6 +23,16 @@ public class TaxonomyTerm extends DrupalEntity
     @JsonDeserialize(using = WrapperDeserializer.class, as = String.class)
     @JsonProperty("weight")
     private String weight;
+
+    public String getTid()
+    {
+        return tid;
+    }
+
+    public void setTid(String tid)
+    {
+        this.tid = tid;
+    }
 
     public String getName()
     {
@@ -38,5 +53,4 @@ public class TaxonomyTerm extends DrupalEntity
     {
         this.weight = weight;
     }
-
 }

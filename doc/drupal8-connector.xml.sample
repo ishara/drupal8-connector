@@ -52,6 +52,12 @@
 	</drupal8:create-taxonomy-term>
 <!-- END_INCLUDE(drupal8:create-taxonomy-term) -->
 
+<!-- BEGIN_INCLUDE(drupal8:update-taxonomy-term) -->
+	<drupal8:update-taxonomy-term>
+		<drupal8:term tid="1"  name="newtag" weight="1" />
+	</drupal8:update-taxonomy-term>
+<!-- END_INCLUDE(drupal8:update-taxonomy-term) -->
+
 <!-- BEGIN_INCLUDE(drupal8:delete-taxonomy-term) -->
 	<drupal8:delete-taxonomy-term termId="1" />
 <!-- END_INCLUDE(drupal8:delete-taxonomy-term) -->

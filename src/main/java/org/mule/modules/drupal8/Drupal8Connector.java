@@ -230,7 +230,7 @@ public class Drupal8Connector
     {
         this.client.deleteUser(uid);
     }
-    
+
     /**
      * Get a taxonomy term by a id
      * 
@@ -247,7 +247,7 @@ public class Drupal8Connector
     {
         return this.client.getTaxonomyTerm(termId);
     }
-    
+
     /**
      * Create a new taxonomy term
      * 
@@ -264,7 +264,24 @@ public class Drupal8Connector
     {
         this.client.createTaxonomyTerm(term);
     }
-    
+
+    /**
+     * Update an existing taxonomy term
+     * 
+     * {@sample.xml ../../../doc/drupal8-connector.xml.sample drupal8:update-taxonomy-term}
+     * 
+     * @param term
+     *            The term to to update
+     * @return void
+     * @throws IOException
+     *             connection
+     */
+    @Processor
+    public void updateTaxonomyTerm(TaxonomyTerm term) throws IOException
+    {
+        this.client.updateTaxonomyTerm(term);
+    }
+
     /**
      * Delete an existing taxonomy term
      * 
@@ -281,7 +298,7 @@ public class Drupal8Connector
     {
         this.client.deleteTaxonomyTerm(termId);
     }
-    
+
     public String getEndpoint()
     {
         return endpoint;
