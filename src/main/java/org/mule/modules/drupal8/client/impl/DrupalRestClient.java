@@ -9,6 +9,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.mule.modules.drupal8.client.DrupalClient;
+import org.mule.modules.drupal8.client.MediaTypes;
 import org.mule.modules.drupal8.client.auth.AuthenticationStrategy;
 import org.mule.modules.drupal8.model.DrupalEntity;
 import org.mule.modules.drupal8.model.Node;
@@ -25,7 +26,14 @@ public class DrupalRestClient implements DrupalClient
 {
     private static final String HTTP_HEADER_METHOD_OVERRIDE = "X-HTTP-Method-Override";
     private static final String HTTP_METHOD_PATCH = "PATCH";
-    private static final String MEDIA_TYPE_HAL_JSON = "application/hal+json";
+
+    public static final String NODE_RESOURCE = "node";
+    public static final String USER_RESOURCE = "user";
+    public static final String TAXONOMY_RESOURCE = "taxonomy/term";
+    public static final String TAXONOMY_CREATE_RESOURCE = "taxonomy_term";
+    public static final String CREATE_ROOT_PATH = "entity";
+
+    public static final String LINK_ROOT = "/rest/type/";
 
     protected Client client;
     protected WebResource webResource;
@@ -46,8 +54,8 @@ public class DrupalRestClient implements DrupalClient
     @Override
     public Node getNode(String nodeId) throws IOException
     {
-        return webResource.path("node").path(nodeId)
-                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON).get(Node.class);
+        return webResource.path(NODE_RESOURCE).path(nodeId)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).get(Node.class);
     }
 
     @Override
@@ -56,23 +64,24 @@ public class DrupalRestClient implements DrupalClient
         node.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/node/"
                 + node.getType()));
 
-        webResource.path("entity").path("node").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
-                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
+        webResource.path(CREATE_ROOT_PATH).path(NODE_RESOURCE)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON).post(node);
     }
 
     @Override
     public void updateNode(Node node) throws IOException
     {
-        webResource.path("node").path(node.getNid())
+        webResource.path(NODE_RESOURCE).path(node.getNid())
                 .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
-                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
-                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(node);
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).post(node);
     }
 
     @Override
     public void deleteNode(String nodeId) throws IOException
     {
-        webResource.path("node").path(nodeId).delete();
+        webResource.path(NODE_RESOURCE).path(nodeId).delete();
     }
 
     @Override
@@ -87,7 +96,7 @@ public class DrupalRestClient implements DrupalClient
     @Override
     public User getUser(String userId) throws IOException
     {
-        return webResource.path("user").path(userId).accept(MediaType.APPLICATION_JSON_TYPE)
+        return webResource.path(USER_RESOURCE).path(userId).accept(MediaType.APPLICATION_JSON)
                 .get(User.class);
     }
 
@@ -96,30 +105,31 @@ public class DrupalRestClient implements DrupalClient
     {
         user.setAdditionalProperties("_links", getHALProperties(endpoint + "/rest/type/user/user"));
 
-        webResource.path("entity").path("user").header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
-                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(user);
+        webResource.path(CREATE_ROOT_PATH).path(USER_RESOURCE)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON).post(user);
     }
 
     @Override
     public void updateUser(User user)
     {
-        webResource.path("user").path(user.getUid())
+        webResource.path(USER_RESOURCE).path(user.getUid())
                 .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
-                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
-                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(user);
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).post(user);
     }
 
     @Override
     public void deleteUser(String uid)
     {
-        webResource.path("user").path(uid).delete();
+        webResource.path(USER_RESOURCE).path(uid).delete();
     }
 
     @Override
     public TaxonomyTerm getTaxonomyTerm(String termId) throws IOException
     {
-        return webResource.path("taxonomy/term").path(termId)
-                .accept(MediaType.APPLICATION_JSON_TYPE).get(TaxonomyTerm.class);
+        return webResource.path(TAXONOMY_RESOURCE).path(termId).accept(MediaType.APPLICATION_JSON)
+                .get(TaxonomyTerm.class);
     }
 
     @Override
@@ -128,25 +138,25 @@ public class DrupalRestClient implements DrupalClient
         term.setAdditionalProperties("_links", getHALProperties(endpoint
                 + "/rest/type/taxonomy_term/tags"));
 
-        webResource.path("entity").path("taxonomy_term")
-                .header(HttpHeaders.ACCEPT, MEDIA_TYPE_HAL_JSON)
-                .header(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_HAL_JSON).post(term);
+        webResource.path(CREATE_ROOT_PATH).path(TAXONOMY_CREATE_RESOURCE)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON).post(term);
 
     }
 
     @Override
     public void updateTaxonomyTerm(TaxonomyTerm term) throws IOException
     {
-        webResource.path("taxonomy/term").path(term.getTid())
-        .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
-        .header(HttpHeaders.ACCEPT,  MediaType.APPLICATION_JSON_TYPE)
-        .header(HttpHeaders.CONTENT_TYPE,  MediaType.APPLICATION_JSON_TYPE).post(term);
+        webResource.path(TAXONOMY_RESOURCE).path(term.getTid())
+                .header(HTTP_HEADER_METHOD_OVERRIDE, HTTP_METHOD_PATCH)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).post(term);
     }
 
     @Override
     public void deleteTaxonomyTerm(String termId) throws IOException
     {
-        webResource.path("taxonomy/term").path(termId).delete();
+        webResource.path(TAXONOMY_RESOURCE).path(termId).delete();
     }
 
     private Map<String, Object> getHALProperties(String link)

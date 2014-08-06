@@ -76,9 +76,13 @@ public class User extends DrupalEntity {
 	@JsonProperty("init")
 	private String init;
 	
+	@JsonSerialize(using = WrapperSerializer.class, as = List.class, include=JsonSerialize.Inclusion.NON_EMPTY)
+    @JsonDeserialize(using = WrapperDeserializer.class, as = List.class)
 	@JsonProperty("roles")
 	private List<Role> roles = new ArrayList<Role>();
 	
+	@JsonSerialize(using = WrapperSerializer.class, as = List.class, include=JsonSerialize.Inclusion.NON_EMPTY)
+    @JsonDeserialize(using = WrapperDeserializer.class, as = List.class)
 	@JsonProperty("user_picture")
 	private List<UserPicture> user_picture = new ArrayList<UserPicture>();
 	

@@ -1,4 +1,4 @@
-package org.mule.modules.drupal8.client.impl.auth;
+package org.mule.modules.drupal8.client.auth.impl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
