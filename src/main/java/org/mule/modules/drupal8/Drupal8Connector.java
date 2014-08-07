@@ -309,4 +309,14 @@ public class Drupal8Connector
         this.endpoint = endpoint;
     }
 
+    public DrupalClient getClient()
+    {
+        return client;
+    }
+
+    public void setClient(DrupalClient client)
+    {
+        this.client = client;
+    }
+
 }
